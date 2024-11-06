@@ -1,0 +1,87 @@
+---
+# These are required for the role to work
+pve_api_host:
+pve_api_user:
+pve_api_token_id:
+pve_api_token_secret:
+
+# pve_vm_target_node: If Empty, we will use a random node (if there is a cluster)
+# pve_vm_target_node_force: If true, we will force the target node even if it exists and is on another node
+pve_vm_target_node:
+pve_vm_target_node_force: false
+
+# Can be empty if we just want to create a vm without template
+# pve_clone_storage
+pve_clone_template:
+pve_clone_full: true
+pve_clone_storage:
+
+pve_options_acpi: true
+pve_options_agent: true
+pve_options_autostart: true
+pve_options_onboot: true
+pve_options_boot: "order=scsi0"
+pve_options_hotplug: "network,disk,usb,cpu,memory"
+pve_options_ostype: l26
+pve_options_startup: "order=any"
+
+pve_hardware_bios: seabios
+pve_hardware_memory: 4096
+pve_hardware_balloon: 0
+pve_hardware_cpu: x86-64-v2-AES
+pve_hardware_sockets: 1
+pve_hardware_cores: 4
+pve_hardware_controller: virtio-scsi-single
+
+pve_network:
+  net0:
+    type: virtio
+    bridge: vmbr5
+    macaddr: bc:24:00:05:04:05
+    firewall: true
+
+pve_disks:
+  scsi0:
+    storage: Ceph-Proxmox-Internal-NVME
+    size: 25
+    iothread: 1
+  scsi1:
+    storage: Ceph-Proxmox-Internal-NVME
+    size: 2
+    iothread: 1
+
+pve_cloud_init_custom:
+
+pmx:
+  scsihw: virtio-scsi-single
+  cloud_init:
+    cicustom:
+  meta:
+    name: "{{ inventory_hostname }}"
+    description: "{{ description }}"
+    tags: [linux,icinga2,monitoring]
+    #pool:
+  vm:
+    state: present
+    update_settings: true
+    #target:
+
+
+
+pmx_node:
+pmx_acpi: true
+pmx_agent: true
+pmx_autostart: true
+pmx_clone: "Ubuntu-24.04-Template"
+pmx_cores: 4
+pmx_description: "{{ description }}"
+
+
+
+
+
+
+#ansible_port: 22
+#ansible_host: 192.168.2.9v
+
+
