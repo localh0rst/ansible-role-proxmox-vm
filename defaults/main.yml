@@ -1,4 +1,5 @@
 ---
+pve_debug_facts: false
 # These are required for the role to work
 pve_api_host:
 pve_api_user:
@@ -9,6 +10,11 @@ pve_api_token_secret:
 # pve_vm_target_node_force: If true, we will force the target node even if it exists and is on another node
 pve_vm_target_node:
 pve_vm_target_node_force: false
+
+# When running from a host specific playbook you might wanna use "{{ inventory_hostname }}"
+pve_meta_name:
+pve_meta_description:
+pve_meta_tags:
 
 # Can be empty if we just want to create a vm without template
 # pve_clone_storage
@@ -51,37 +57,4 @@ pve_disks:
     iothread: 1
 
 pve_cloud_init_custom:
-
-pmx:
-  scsihw: virtio-scsi-single
-  cloud_init:
-    cicustom:
-  meta:
-    name: "{{ inventory_hostname }}"
-    description: "{{ description }}"
-    tags: [linux,icinga2,monitoring]
-    #pool:
-  vm:
-    state: present
-    update_settings: true
-    #target:
-
-
-
-pmx_node:
-pmx_acpi: true
-pmx_agent: true
-pmx_autostart: true
-pmx_clone: "Ubuntu-24.04-Template"
-pmx_cores: 4
-pmx_description: "{{ description }}"
-
-
-
-
-
-
-#ansible_port: 22
-#ansible_host: 192.168.2.9v
-
 

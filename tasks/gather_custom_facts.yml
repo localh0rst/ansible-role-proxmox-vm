@@ -1,0 +1,9 @@
+---
+- name: Proxmox [ {{ inventory_hostname }} ] - Gather Cluster Information
+  community.general.proxmox_node_info:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+  register: proxmox_nodes
+  delegate_to: localhost
