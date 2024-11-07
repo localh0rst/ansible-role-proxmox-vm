@@ -7,3 +7,13 @@
     api_token_secret: "{{ pve_api_token_secret }}"
   register: proxmox_nodes
   delegate_to: localhost
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Debug Cluster Information
+  debug:
+    msg: "{{ proxmox_nodes }}"
+  when: pve_debug_facts
+
+#- name: Proxmox [ {{ inventory_hostname }} ] - Gather Random VM node
+#  set_fact:
+#    pve_vm_target_node: "{{ proxmox_nodes.proxmox_nodes | random }}"
+#  when: pve_vm_target_node is not defined and proxmox_nodes.proxmox_nodes | length > 1
