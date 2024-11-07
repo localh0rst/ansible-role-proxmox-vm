@@ -8,12 +8,25 @@
   register: proxmox_nodes
   delegate_to: localhost
 
-- name: Proxmox [ {{ inventory_hostname }} ] - Debug Cluster Information
+- name: Proxmox [ {{ inventory_hostname }} ] - Gather Random VM node
+  set_fact:
+    pve_vm_target_node: "{{ (proxmox_nodes.proxmox_nodes | random).node }}"
+  when: 
+    - pve_vm_target_node is not defined or pve_vm_target_node is None
+    - proxmox_nodes.proxmox_nodes | length > 1
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Debug Random Node
   debug:
-    msg: "{{ proxmox_nodes }}"
+    msg: "{{ pve_vm_target_node }}"
   when: pve_debug_facts
 
-#- name: Proxmox [ {{ inventory_hostname }} ] - Gather Random VM node
-#  set_fact:
-#    pve_vm_target_node: "{{ proxmox_nodes.proxmox_nodes | random }}"
-#  when: pve_vm_target_node is not defined and proxmox_nodes.proxmox_nodes | length > 1
+- name: Proxmox [ {{ inventory_hostname }} ] - Gather Template Information
+  community.general.proxmox_vm_info:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_clone_template }}"
+  register: proxmox_template_info
+  delegate_to: localhost
+  when: pve_clone_template
