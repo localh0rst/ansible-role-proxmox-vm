@@ -1,0 +1,48 @@
+---
+- name : Proxmox [ {{ inventory_hostname }} ] - Generate Cloud Init Meta snippet
+  become: yes
+  become_user: root
+  ansible.builtin.template:
+    src: cloud-init-meta.yml.j2 
+    dest: "{{ pve_cloud_init_snippet_directory }}/ci-{{ pve_meta_name }}-meta.yml"
+  delegate_to: "{{ pve_cloud_init_node }}"
+  when: pve_cloud_init_custom_meta
+
+- name : Proxmox [ {{ inventory_hostname }} ] - Generate Cloud Init Network snippet
+  become: yes
+  become_user: root
+  ansible.builtin.template:
+    src: cloud-init-network.yml.j2 
+    dest: "{{ pve_cloud_init_snippet_directory }}/ci-{{ pve_meta_name }}-network.yml"
+  delegate_to: "{{ pve_cloud_init_node }}"
+  when: pve_cloud_init_custom_network
+
+- name : Proxmox [ {{ inventory_hostname }} ] - Generate Cloud Init User snippet
+  become: yes
+  become_user: root
+  ansible.builtin.template:
+    src: cloud-init-user.yml.j2 
+    dest: "{{ pve_cloud_init_snippet_directory }}/ci-{{ pve_meta_name }}-user.yml"
+  delegate_to: "{{ pve_cloud_init_node }}"
+  when: pve_cloud_init_custom_user
+
+- name : Proxmox [ {{ inventory_hostname }} ] - Create cicustom String
+  set_fact:
+    pve_cloud_init_cicustom: 
+      - "{{ pve_cloud_init_custom_meta    | ternary( 'meta={{pve_cloud_init_storage}}:snippets/ci-{{ pve_meta_name }}-meta.yml',       '' ) }}"
+      - "{{ pve_cloud_init_custom_network | ternary( 'network={{pve_cloud_init_storage}}:snippets/ci-{{ pve_meta_name }}-network.yml', '' ) }}"
+      - "{{ pve_cloud_init_custom_user    | ternary( 'user={{pve_cloud_init_storage}}:snippets/ci-{{ pve_meta_name }}-user.yml',       '' ) }}"
+  delegate_to: localhost
+
+- name : Proxmox [ {{ inventory_hostname }} ] - Enable Custom CI for VM
+  community.general.proxmox_kvm:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+    node: "{{ pve_vm_current_node | ternary(pve_vm_current_node, pve_vm_target_node) }}"
+    cicustom: "{{ pve_cloud_init_cicustom | join(',') }}"
+    update: true
+  delegate_to: localhost
+  when: not pve_vm_current_node or pve_always_update_cloud_init

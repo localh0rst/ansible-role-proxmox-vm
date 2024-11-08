@@ -1,3 +1,39 @@
 ---
+# Gather facts
 - import_tasks: gather_custom_facts.yml
 
+# Clone VM
+- import_tasks: clone_vm.yml
+  when: 
+    - pve_clone_template
+    - not pve_vm_current_node
+
+# Create VM
+- import_tasks: create_vm.yml
+  when: 
+    - not pve_clone_template
+    - not pve_vm_current_node
+
+# Update Meta Data
+- import_tasks: update_meta.yml
+
+# Update Hardware
+- import_tasks: update_hardware.yml
+
+# Update Options
+- import_tasks: update_options.yml
+
+# Check, Create, Resize and/or Move Disks
+- import_tasks: manage_disks.yml
+
+# Update Network 
+- import_tasks: update_network.yml
+
+# Generating Cloud-Init Config
+- import_tasks: cloud_init.yml
+  when: 
+    - pve_cloud_init_enabled
+    - pve_cloud_init_snippet_directory
+
+# Start VM if requested
+- import_tasks: set_vm_state.yml

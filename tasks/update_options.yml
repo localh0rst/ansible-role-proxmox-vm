@@ -1,0 +1,21 @@
+---
+- name: Proxmox [ {{ inventory_hostname }} ] - Updating Options
+  community.general.proxmox_kvm:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+    node: "{{ pve_vm_current_node | ternary(pve_vm_current_node, pve_vm_target_node) }}"
+    boot: "{{ pve_options_boot | default(omit, true) }}"
+    acpi: "{{ pve_options_acpi | default(omit, true) }}"
+    agent: "{{ pve_options_agent | default(omit, true) }}"
+    autostart: "{{ pve_options_autostart | default(omit, true) }}"
+    hotplug: "{{ pve_options_hotplug | default(omit, true) }}" 
+    onboot: "{{ pve_options_onboot | default(omit, true) }}"
+    ostype: "{{ pve_options_ostype | default(omit, true) }}"
+    startup: "{{ pve_options_startup | default(omit, true) }}"
+    update: true
+    update_unsafe: false
+  delegate_to: localhost
+  when: not pve_vm_current_node or pve_always_update_options

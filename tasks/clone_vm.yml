@@ -1,0 +1,18 @@
+---
+- name: Proxmox [ {{ inventory_hostname }} ] - Clone VM from template {{ pve_clone_template }}
+  community.general.proxmox_kvm:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    storage: "{{ pve_clone_storage | default(omit, true) }}"
+    clone: "{{ pve_clone_template }}"
+    full: "{{ pve_clone_full }}"
+    name: "{{ pve_meta_name }}"
+    node: "{{  pve_clone_template_node }}"
+    target: "{{ pve_vm_target_node }}"
+  delegate_to: localhost
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Sleeping {{ pve_wait_for_everything_to_settle }} seconds to let everything settle
+  pause:
+    seconds: "{{ pve_wait_for_everything_to_settle }}"

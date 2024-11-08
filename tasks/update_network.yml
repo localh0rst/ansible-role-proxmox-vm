@@ -1,0 +1,23 @@
+---
+- name: Proxmox [ {{ inventory_hostname }} ] - Updating Network
+  community.general.proxmox_nic:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+    interface: "{{ item.key }}" 
+    bridge: "{{ item.value.bridge }}"
+    firewall: "{{ item.value.firewall | default(omit, true) }}"
+    link_down: "{{ item.value.link_down | default(omit, true) }}"
+    mac: "{{ item.value.mac | default(omit, true) }}"
+    model: "{{ item.value.model | default(omit, true) }}"
+    mtu: "{{ item.value.mtu | default(omit, true) }}"
+    queues: "{{ item.value.queues | default(omit, true) }}"
+    rate: "{{ item.value.rate | default(omit, true) }}"
+    tag: "{{ item.value.tag | default(omit, true) }}"
+    trunks: "{{ item.value.trunks | default(omit, true) }}"
+    state: "{{ item.value.state | default(omit, true) }}"
+  delegate_to: localhost
+  with_dict: "{{ pve_network }}"
+  when: not pve_vm_current_node or pve_always_update_network

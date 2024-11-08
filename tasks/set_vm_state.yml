@@ -1,0 +1,12 @@
+---
+- name: Proxmox [ {{ inventory_hostname }} ] - Setting VM State
+  community.general.proxmox_kvm:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+    state: "{{ pve_meta_state }}"
+  delegate_to: localhost
+  when: pve_meta_state == 'stopped' or pve_meta_state == 'started' or pve_meta_state == 'restarted'
+    

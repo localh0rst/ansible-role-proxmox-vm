@@ -1,0 +1,50 @@
+---
+- name: Proxmox [ {{ inventory_hostname }} ] - Checking if all disks are present
+  community.general.proxmox_disk:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+    iothread: "{{ item.value.iothread | default(omit, true) }}"
+    disk: "{{ item.key }}"
+    storage: "{{ item.value.storage | default(omit, true) }}"
+    size: "{{ item.value.size }}"
+    state: present
+  with_dict: "{{ pve_disks }}"
+  delegate_to: localhost
+  when: not pve_vm_current_node or pve_always_update_disks
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Moving disks to the correct storage
+  community.general.proxmox_disk:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+    disk: "{{ item.key }}"
+    target_storage: "{{ item.value.storage }}"
+    state: moved
+    delete_moved: "{{ item.value.delete_moved | default(omit, true) }}"
+  with_dict: "{{ pve_disks }}"
+  delegate_to: localhost
+  when: 
+    - item.value.storage is defined
+    - not pve_vm_current_node or pve_always_update_disks
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Resizing disks if required
+  community.general.proxmox_disk:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+    disk: "{{ item.key }}"
+    storage: "{{ item.value.storage | default(omit, true) }}"
+    size: "{{ item.value.size }}G"
+    state: resized
+  with_dict: "{{ pve_disks }}"
+  delegate_to: localhost
+  when: not pve_vm_current_node or pve_always_update_disks
+
+

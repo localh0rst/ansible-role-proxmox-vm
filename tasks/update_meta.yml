@@ -1,0 +1,18 @@
+---
+- name: Proxmox [ {{ inventory_hostname }} ] - Update meta Data
+  community.general.proxmox_kvm:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+    description: "{{ pve_meta_description }}"
+    tags: "{{ pve_meta_tags }}"
+    node: "{{ pve_vm_current_node | ternary(pve_vm_current_node, pve_vm_target_node) }}"
+    update: true
+    update_unsafe: false
+  delegate_to: localhost
+  # Update only when we have a fresh vm or if pve_always_update_meta is set
+  when: not pve_vm_current_node or pve_always_update_meta
+    
+
