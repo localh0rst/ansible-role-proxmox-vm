@@ -8,17 +8,28 @@
   register: proxmox_nodes
   delegate_to: localhost
 
-- name: Proxmox [ {{ inventory_hostname }} ] - Gather Random VM node
+- name: Proxmox [ {{ inventory_hostname }} ] - Choose Random VM node
   set_fact:
     pve_vm_target_node: "{{ (proxmox_nodes.proxmox_nodes | random).node }}"
   when: 
-    - pve_vm_target_node is not defined or pve_vm_target_node is None
+    - pve_vm_target_node is not defined or pve_vm_target_node is none
     - proxmox_nodes.proxmox_nodes | length > 1
 
-- name: Proxmox [ {{ inventory_hostname }} ] - Debug Random Node
-  debug:
-    msg: "{{ pve_vm_target_node }}"
-  when: pve_debug_facts
+- name: Proxmox [ {{ inventory_hostname }} ] - Check if VM already exists
+  community.general.proxmox_vm_info:
+    api_host: "{{ pve_api_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_id }}"
+    api_token_secret: "{{ pve_api_token_secret }}"
+    name: "{{ pve_meta_name }}"
+  register: proxmox_vm_info
+  delegate_to: localhost
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Set Current VM Node
+  set_fact:
+    pve_vm_current_node: "{{ proxmox_vm_info.proxmox_vms[0].node }}"
+  when: 
+    - proxmox_vm_info.proxmox_vms | length == 1
 
 - name: Proxmox [ {{ inventory_hostname }} ] - Gather Template Information
   community.general.proxmox_vm_info:
@@ -29,4 +40,25 @@
     name: "{{ pve_clone_template }}"
   register: proxmox_template_info
   delegate_to: localhost
-  when: pve_clone_template
+  when: 
+    - pve_clone_template
+    - pve_clone_template_node is not defined or pve_clone_template_node is none
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Set Template node
+  set_fact:
+    pve_clone_template_node: "{{ proxmox_template_info.proxmox_vms[0].node }}"
+  when: 
+    - pve_clone_template
+    - proxmox_template_info.proxmox_vms | length == 1
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Fail early if Template does not exist
+  fail:
+    msg: "Proxmox Template {{ pve_clone_template }} not found"
+  when: 
+    - pve_clone_template
+    - proxmox_template_info.proxmox_vms | length == 0
+
+- name: Proxmox [ {{ inventory_hostname }} ] - Debug all facts
+  debug:
+    msg: "Target Node {{ pve_vm_target_node }} - Current Node {{ pve_vm_current_node }} - Template Node {{ pve_clone_template_node }}"
+  delegate_to: localhost
