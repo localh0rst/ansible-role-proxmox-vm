@@ -79,3 +79,4 @@ pve_cloud_init_snippet_directory:
 pve_cloud_init_custom_meta:
 pve_cloud_init_custom_user:
 pve_cloud_init_custom_network:
+pve_cloud_init_custom_vendor:
