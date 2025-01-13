@@ -6,6 +6,7 @@
     src: cloud-init-meta.yml.j2 
     dest: "{{ pve_cloud_init_snippet_directory }}/ci-{{ pve_meta_name }}-meta.yml"
   delegate_to: "{{ pve_cloud_init_node }}"
+  remote_user: "{{ pve_remote_user }}"
   when: pve_cloud_init_custom_meta
 
 - name : Proxmox [ {{ inventory_hostname }} ] - Generate Cloud Init Network snippet
@@ -15,6 +16,7 @@
     src: cloud-init-network.yml.j2 
     dest: "{{ pve_cloud_init_snippet_directory }}/ci-{{ pve_meta_name }}-network.yml"
   delegate_to: "{{ pve_cloud_init_node }}"
+  remote_user: "{{ pve_remote_user }}"
   when: pve_cloud_init_custom_network
 
 - name : Proxmox [ {{ inventory_hostname }} ] - Generate Cloud Init User snippet
@@ -24,6 +26,7 @@
     src: cloud-init-user.yml.j2 
     dest: "{{ pve_cloud_init_snippet_directory }}/ci-{{ pve_meta_name }}-user.yml"
   delegate_to: "{{ pve_cloud_init_node }}"
+  remote_user: "{{ pve_remote_user }}"
   when: pve_cloud_init_custom_user
 
 - name : Proxmox [ {{ inventory_hostname }} ] - Generate Cloud Init Vendor snippet
@@ -33,6 +36,7 @@
     src: cloud-init-user.yml.j2 
     dest: "{{ pve_cloud_init_snippet_directory }}/ci-{{ pve_meta_name }}-vendor.yml"
   delegate_to: "{{ pve_cloud_init_node }}"
+  remote_user: "{{ pve_remote_user }}"
   when: pve_cloud_init_custom_vendor
 
 - name : Proxmox [ {{ inventory_hostname }} ] - Create cicustom String
