@@ -1,4 +1,6 @@
 ---
+pve_remote_user: root
+
 pve_debug_facts: false
 pve_always_update_hardware: false
 pve_always_update_meta: false
