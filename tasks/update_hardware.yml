@@ -16,7 +16,7 @@
     cpulimit: "{{ pve_hardware_cpulimit | default(omit, true) }}"
     cpuunits: "{{ pve_hardware_cpuunits | default(omit, true) }}"
     numa: "{{ pve_hardware_numa | default(omit, true) }}"
-    nume_enabled: "{{ pve_hardware_numa_enabled | default(omit, true) }}"
+    numa_enabled: "{{ pve_hardware_numa_enabled | default(omit, true) }}"
     machine: "{{ pve_hardware_machine | default(omit, true) }}"
     scsihw: "{{ pve_hardware_scsihw | default(omit, true) }}"
     vga: "{{ pve_hardware_vga | default(omit, true) }}"
